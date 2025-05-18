@@ -2,6 +2,7 @@ package ru.praktikum.steps;
 
 import io.qameta.allure.Step;
 import io.restassured.http.ContentType;
+import io.restassured.response.Response;
 import io.restassured.response.ValidatableResponse;
 import io.restassured.specification.RequestSpecification;
 import ru.praktikum.models.Order;
@@ -17,18 +18,34 @@ public class OrderSteps {
                 .baseUri(ROOT);
     }
     @Step("Создание нового заказа")
-    public ValidatableResponse orderCreate(Order order) {
+
+    public Response orderCreate(Order order) {
         return spec()
                 .body(order)
-                .post(ORDER_POST_CREATE)
-                .then();
+                .when()
+                .post(ORDER_POST_CREATE);
     }
+
 
     @Step("Получение списка заказов")
     public ValidatableResponse orderGetList(){
         return spec()
-                .baseUri(ROOT)
                 .get(ORDER_GET_LIST)
+                .then();
+    }
+
+    @Step("Отмена заказа")
+    public Response orderCancel (int trackNum) {
+        return spec()
+                .queryParam("track", trackNum)
+                .put(ORDER_CANCEL);
+    }
+
+    @Step
+    public void cancel (int trackNum){
+        spec()
+                .when()
+                .put(ORDER_CANCEL + trackNum)
                 .then();
     }
 }

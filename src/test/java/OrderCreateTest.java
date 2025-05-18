@@ -1,12 +1,15 @@
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import io.restassured.response.Response;
+import org.apache.http.HttpStatus;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import ru.praktikum.models.Order;
 import ru.praktikum.steps.OrderSteps;
 
-import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.*;
 import static ru.praktikum.constants.ScooterColors.BLACK_COLOR;
 import static ru.praktikum.constants.ScooterColors.GREY_COLOR;
 
@@ -22,6 +25,9 @@ public class OrderCreateTest {
     private final String deliveryDate;
     private final String comment;
     private final String[] color;
+    private Integer trackNum;
+
+    private final OrderSteps orderSteps = new OrderSteps();
 
     public OrderCreateTest(String firstName, String lastName, String address, String metroStation, String phone, Integer rentTime, String deliveryDate, String comment, String [] color){
         this.firstName = firstName;
@@ -49,12 +55,18 @@ public class OrderCreateTest {
     @Test
     @DisplayName("Создание заказа")
     @Description("Проверка создания заказов на самокаты с разными цветами")
-    public void orderCreate() {
+    public void orderCreateTest() {
         Order order = new Order(firstName, lastName, address, metroStation, phone, rentTime, deliveryDate, comment, color);
-        OrderSteps orderSteps = new OrderSteps();
-        orderSteps.orderCreate(order)
-                .assertThat().body("track", instanceOf(Integer.class))
+        Response response = orderSteps.orderCreate(order);
+        trackNum = response.body().path("track");
+        response
+                .then()
+                .statusCode(HttpStatus.SC_CREATED)
                 .and()
-                .statusCode(201);
+                .assertThat().body("track", notNullValue());
+    }
+    @After
+    public void tearDown(){
+        orderSteps.cancel(trackNum);
     }
 }

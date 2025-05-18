@@ -8,5 +8,5 @@ public class ApiConstants {
     public static String COURIER_DELETE = "/api/v1/courier/";
     public static String ORDER_POST_CREATE = "/api/v1/orders";
     public static String ORDER_GET_LIST = "/api/v1/orders";
-
+    public static String ORDER_CANCEL = "/api/v1/orders/cancel";
 }

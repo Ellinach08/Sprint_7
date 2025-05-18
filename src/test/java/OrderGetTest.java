@@ -1,5 +1,6 @@
 import io.qameta.allure.Description;
 import io.qameta.allure.junit4.DisplayName;
+import org.apache.http.HttpStatus;
 import org.junit.Test;
 import ru.praktikum.steps.OrderSteps;
 
@@ -10,11 +11,11 @@ public class OrderGetTest {
     @Test
     @DisplayName("Получение списка заказов")
     @Description("Проверка получение списка заказов с возвращаемым списком")
-    public void getOrderList(){
+    public void getOrderListTest(){
         OrderSteps orderSteps = new OrderSteps();
         orderSteps.orderGetList()
-                .assertThat().body("orders", notNullValue())
+                .assertThat().statusCode(HttpStatus.SC_OK)
                 .and()
-                .statusCode(200);
+                .body("orders", notNullValue());
     }
 }
